@@ -747,7 +747,7 @@ labReports: [
     title: '血液常規檢查 (CBC) - 2026/10/01',
     dateTime: '2026-10-01T10:20:00',
     visible: true,
-    publishMode: 'immediate',
+    publishMode: 'manual',
     items: [
       { name: 'WBC', value: '24,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
       { name: 'RBC', value: '4.01', unit: '10^6/μL', referenceRange: '4.5 - 5.9', status: 'low' },
@@ -762,7 +762,7 @@ labReports: [
     title: '白血球分類計數 (Differential Count) - 2026/10/01',
     dateTime: '2026-10-01T10:20:00',
     visible: true,
-    publishMode: 'immediate',
+    publishMode: 'manual',
     items: [
       { name: 'Neutrophil (Seg)', value: '70.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
       { name: 'Band form', value: '8.6', unit: '%', referenceRange: '0 - 5', status: 'high' },
@@ -778,7 +778,7 @@ labReports: [
     title: '臨床生化檢驗 (BIO) - 2026/10/01',
     dateTime: '2026-10-01T10:20:00',
     visible: true,
-    publishMode: 'immediate',
+    publishMode: 'manual',
     items: [
       { name: 'BUN', value: '25', unit: 'mg/dL', referenceRange: '7 - 20', status: 'high' },
       { name: 'Creatinine', value: '2.4', unit: 'mg/dL', referenceRange: 'Male 0.7 - 1.3', status: 'high' },
