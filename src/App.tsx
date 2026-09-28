@@ -475,12 +475,17 @@ export default function App() {
               }
             });
 
+            if (presetMatch.prescriptions && JSON.stringify(patient.prescriptions || []) !== JSON.stringify(presetMatch.prescriptions)) {
+              updated = true;
+            }
+
             if (updated) {
               const enrichedPatient = {
                 ...patient,
                 imagingStudies,
                 ecgReports,
-                ultrasoundReports
+                ultrasoundReports,
+                prescriptions: presetMatch.prescriptions ?? patient.prescriptions ?? []
               };
               savePatientToFirestore(enrichedPatient);
               return enrichedPatient;
@@ -491,7 +496,10 @@ export default function App() {
             ...patient,
             imagingStudies,
             ecgReports,
-            ultrasoundReports
+            ultrasoundReports,
+            // Preset medication history is static case data. Keep it in sync even when
+            // an older Firestore patient document was created before medications were added.
+            prescriptions: presetMatch?.prescriptions ?? patient.prescriptions ?? []
           };
         });
 
@@ -682,7 +690,7 @@ export default function App() {
             // 1. Dynamic Scheduled Imaging Release Check
             const updatedImaging = p.imagingStudies.map(study => {
               const targetSeconds = (study.publishMinutesRemaining || 0) * 60;
-              const isTimerTrigger = (study.publishMode === 'timer' || study.publishMode === 'scheduled') && study.publishMinutesRemaining !== undefined && nextVal === targetSeconds;
+              const isTimerTrigger = (study.publishMode === 'timer' || study.publishMode === 'scheduled') && study.publishMinutesRemaining !== undefined && nextVal <= targetSeconds;
               // Legacy support: for Kao-Ling's CXR2, if it doesn't have publishMode set but is id 'img-4-2-cxr2', trigger at 540s
               const isLegacyCxr2Trigger = p.id === 'pat-4' && study.id === 'img-4-2-cxr2' && nextVal === 540;
 
@@ -701,7 +709,7 @@ export default function App() {
              // 2. Dynamic Scheduled Lab Reports Release Check
             const updatedLabs = p.labReports.map(report => {
               const targetSeconds = (report.publishMinutesRemaining || 0) * 60;
-              const isTimerTrigger = (report.publishMode === 'timer' || report.publishMode === 'scheduled') && report.publishMinutesRemaining !== undefined && nextVal === targetSeconds;
+              const isTimerTrigger = (report.publishMode === 'timer' || report.publishMode === 'scheduled') && report.publishMinutesRemaining !== undefined && nextVal <= targetSeconds;
 
               if (isTimerTrigger && !report.visible) {
                 changed = true;
@@ -717,7 +725,7 @@ export default function App() {
             // 2.5. Dynamic Scheduled ECG Reports Release Check
             const updatedEcgs = (p.ecgReports || []).map(ecg => {
               const targetSeconds = (ecg.publishMinutesRemaining || 0) * 60;
-              const isTimerTrigger = (ecg.publishMode === 'timer' || ecg.publishMode === 'scheduled') && ecg.publishMinutesRemaining !== undefined && nextVal === targetSeconds;
+              const isTimerTrigger = (ecg.publishMode === 'timer' || ecg.publishMode === 'scheduled') && ecg.publishMinutesRemaining !== undefined && nextVal <= targetSeconds;
 
               if (isTimerTrigger && !ecg.visible) {
                 changed = true;
@@ -733,7 +741,7 @@ export default function App() {
             // 2.6. Dynamic Scheduled Ultrasound Reports Release Check
             const updatedUltrasounds = (p.ultrasoundReports || []).map(ultra => {
               const targetSeconds = (ultra.publishMinutesRemaining || 0) * 60;
-              const isTimerTrigger = (ultra.publishMode === 'timer' || ultra.publishMode === 'scheduled') && ultra.publishMinutesRemaining !== undefined && nextVal === targetSeconds;
+              const isTimerTrigger = (ultra.publishMode === 'timer' || ultra.publishMode === 'scheduled') && ultra.publishMinutesRemaining !== undefined && nextVal <= targetSeconds;
 
               if (isTimerTrigger && !ultra.visible) {
                 changed = true;
