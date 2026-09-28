@@ -90,6 +90,7 @@ export default function App() {
           let imagingStudies = patient.imagingStudies || [];
           let ecgReports = patient.ecgReports || [];
           let ultrasoundReports = patient.ultrasoundReports || [];
+          let labReports = patient.labReports || [];
 
           if (presetMatch) {
             presetMatch.imagingStudies?.forEach(presetStudy => {
@@ -399,12 +400,13 @@ export default function App() {
           }
         });
 
-        // Enrich presets with new studies/ecgs/ultrasound if updated in code
+        // Enrich presets with new studies/ecgs/ultrasound/labs if updated in code
         const mergedList = rawList.map(patient => {
           const presetMatch = PRESET_PATIENTS.find(p => p.id === patient.id);
           let imagingStudies = patient.imagingStudies || [];
           let ecgReports = patient.ecgReports || [];
           let ultrasoundReports = patient.ultrasoundReports || [];
+          let labReports = patient.labReports || [];
 
           if (presetMatch) {
             let updated = false;
@@ -475,6 +477,16 @@ export default function App() {
               }
             });
 
+            // Add newly introduced preset lab reports (for example ABG) without
+            // overwriting the live visible/hidden state of reports already in Firestore.
+            presetMatch.labReports?.forEach(presetLab => {
+              const existingIdx = labReports.findIndex(lab => lab.id === presetLab.id);
+              if (existingIdx === -1) {
+                labReports = [...labReports, presetLab];
+                updated = true;
+              }
+            });
+
             if (presetMatch.prescriptions && JSON.stringify(patient.prescriptions || []) !== JSON.stringify(presetMatch.prescriptions)) {
               updated = true;
             }
@@ -485,6 +497,7 @@ export default function App() {
                 imagingStudies,
                 ecgReports,
                 ultrasoundReports,
+                labReports,
                 prescriptions: presetMatch.prescriptions ?? patient.prescriptions ?? []
               };
               savePatientToFirestore(enrichedPatient);
@@ -497,6 +510,7 @@ export default function App() {
             imagingStudies,
             ecgReports,
             ultrasoundReports,
+            labReports,
             // Preset medication history is static case data. Keep it in sync even when
             // an older Firestore patient document was created before medications were added.
             prescriptions: presetMatch?.prescriptions ?? patient.prescriptions ?? []
