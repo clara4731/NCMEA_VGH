@@ -644,50 +644,40 @@ export const PRESET_PATIENTS: Patient[] = [
         dept: '急診'
       }
     ],
-    imagingStudies: [
-      {
-        id: 'img-hr-cxr',
-        title: '胸部 X 光檢查 (Chest PA/AP View)',
-        studyType: 'XRAY',
-        imageUrl: '/cxr/CXR.png',
-        description: 'Chest PA view (2026-10-01 10:30:15): Bilateral lung fields are clear without active lung lesions, consolidations, or pneumothorax. Costophrenic angles are sharp. Cardiothoracic ratio (CTR) is within normal limits. Subdiaphragmatic gas shadow is normal without free air.',
-        dateTime: '2026-10-01T10:30:15',
-        visible: true,
-        publishMode: 'immediate'
-      },
-      {
-        id: 'img-4-1',
-        title: '胸部X光正面照 (CXR PA view) - 2026/10/03 (CXR1 - L35標記)',
-        studyType: 'XRAY',
-        imageUrl: '/images/cxr1_l35.svg',
-        description: '胸部 X 光正面照（CXR1）顯示：右上角有 L35 標記。可見置入良好之氣管切開套管（Tracheostomy tube）與鼻胃管（NG tube）導管端影通過胃食道接合部置於胃腔。雙側肺野呈輕微/中度斑片狀浸潤，符合術後併發吸入性肺炎/肺部感染初階。',
-        dateTime: '2026-10-01T09:20:00',
-        visible: true,
-        publishMode: 'immediate'
-      },
-      {
-        id: 'img-4-2-cxr2',
-        title: '胸部X光正面照 (CXR PA view) - 2026/10/03 (CXR2 - L35標記/浸潤惡化)',
-        studyType: 'XRAY',
-        imageUrl: '/images/cxr2_l35.svg',
-        description: '胸部 X 光正面照（CXR2）顯示：右上角標記 L35。雙側中下肺野的斑片狀浸潤與實變（consolidation/infiltration）急劇惡化擴大，左下肺尤為嚴重。符合吸入性肺炎合併急性呼吸窘迫症（ARDS）進展期之影像特徵。',
-        dateTime: '2026-10-01T09:21:00',
-        visible: false,
-        publishMode: 'timer',
-        publishMinutesRemaining: 9
-      },
-    ],
-    ecgReports: [
-      {
-        id: 'ecg-hr-1',
-        title: '標準 12 導程心電圖 (12-Lead ECG) - 正常竇性心律',
-        imageUrl: '/ecg/ECG.png',
-        description: 'Vent. rate: 72 BPM, PR interval: 160 ms, QRS duration: 88 ms, QT/QTcB: 392/429 ms, P-R-T axes: 54 35 41°. Interpretation: Normal sinus rhythm. Normal ECG. No ST-T segment elevation or acute myocardial ischemia.',
-        dateTime: '2026-10-03T10:30:15',
-        visible: true,
-        publishMode: 'immediate'
-      }
-    ],
+imagingStudies: [
+  {
+    id: 'img-hr-cxr-wrong',
+    title: '胸部 X 光檢查 (Chest X-Ray)',
+    studyType: 'XRAY',
+    imageUrl: '/cxr/cxr2_wrong.jpg',
+    description: 'Portable chest radiograph.',
+    dateTime: '2026-10-01T10:30:15',
+    visible: true,
+    publishMode: 'immediate'
+  },
+  {
+    id: 'img-hr-cxr-correct',
+    title: '胸部 X 光檢查 (Chest X-Ray)',
+    studyType: 'XRAY',
+    imageUrl: '/cxr/cxr2_correct.jpg',
+    description: 'Portable chest radiograph.',
+    dateTime: '2026-10-01T10:30:15',
+    visible: false,
+    publishMode: 'manual'
+  }
+],
+
+ecgReports: [
+  {
+    id: 'ecg-hr-1',
+    title: '標準 12 導程心電圖 (12-Lead ECG)',
+    imageUrl: '/ecg/EKG2.jpg',
+    description: '12-lead electrocardiogram.',
+    dateTime: '2026-10-01T10:30:15',
+    visible: true,
+    publishMode: 'immediate'
+  }
+],
     ultrasoundReports: [
 
     ],
