@@ -387,15 +387,22 @@ export default function App() {
           }
         });
 
-        // Merge any missing preset patients (e.g. newly added test patients)
-        const rawList = [...cleanedFirestorePatients];
-        PRESET_PATIENTS.forEach(preset => {
-          const exists = rawList.some(p => p.id === preset.id);
-          if (!exists) {
-            rawList.push(preset);
-            savePatientToFirestore(preset);
-          }
-        });
+       // Merge preset patients and force preset data to replace old Firestore versions
+       const rawList = [...cleanedFirestorePatients];
+
+       PRESET_PATIENTS.forEach(preset => {
+       const existingIndex = rawList.findIndex(p => p.id === preset.id);
+
+       if (existingIndex === -1) {
+      // Firestore does not have this patient yet
+        rawList.push(preset);
+        savePatientToFirestore(preset);
+        } else {
+      // Replace old Firestore patient data with the latest preset version
+        rawList[existingIndex] = preset;
+        savePatientToFirestore(preset);
+        }
+       });
 
         // Enrich presets with new studies/ecgs/ultrasound if updated in code
         const mergedList = rawList.map(patient => {
