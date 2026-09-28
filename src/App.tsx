@@ -1508,9 +1508,9 @@ export default function App() {
         <span className="hidden md:inline h-5 w-px bg-slate-600 mx-1"></span>
         <span className="text-[10px] text-slate-300">張清祥：</span>
         <button type="button" onClick={() => handleManualPublish('ecg')} className="px-2.5 py-1 rounded bg-rose-700 hover:bg-rose-600 text-[11px] font-bold cursor-pointer">⚡ 發布 ECG</button>
-        <button type="button" onClick={() => handleManualPublish('cxr')} className="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-600 text-[11px] font-bold cursor-pointer">🩻 發布正確 CXR</button>
-        <button type="button" onClick={() => handleManualPublish('lab')} className="px-2.5 py-1 rounded bg-violet-700 hover:bg-violet-600 text-[11px] font-bold cursor-pointer">🧪 發布正確 Lab</button>
-        <span className="ml-auto text-[10px] text-slate-300 font-mono">11:00 自動錯誤 CXR ｜ 06:00 自動舊 Lab</span>
+        <button type="button" onClick={() => handleManualPublish('cxr')} className="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-600 text-[11px] font-bold cursor-pointer">🩻 發布 CXR</button>
+        <button type="button" onClick={() => handleManualPublish('lab')} className="px-2.5 py-1 rounded bg-violet-700 hover:bg-violet-600 text-[11px] font-bold cursor-pointer">🧪 發布 Lab</button>
+        <span className="ml-auto text-[10px] text-slate-300 font-mono">
       </div>
 
       {/* DASHBOARD WORKSPACE GRID (Sidebar & Main stage) */}
