@@ -386,23 +386,18 @@ export default function App() {
             deletePatientFromFirestore(p.id);
           }
         });
+        // Merge preset patients without overwriting live simulation state in Firestore.
+        // Presets are only inserted when the patient does not exist yet; runtime visibility
+        // changes (timer/manual releases) must remain authoritative during the scenario.
+        const rawList = [...cleanedFirestorePatients];
 
-       // Merge preset patients and force preset data to replace old Firestore versions
-       const rawList = [...cleanedFirestorePatients];
-
-       PRESET_PATIENTS.forEach(preset => {
-       const existingIndex = rawList.findIndex(p => p.id === preset.id);
-
-       if (existingIndex === -1) {
-      // Firestore does not have this patient yet
-        rawList.push(preset);
-        savePatientToFirestore(preset);
-        } else {
-      // Replace old Firestore patient data with the latest preset version
-        rawList[existingIndex] = preset;
-        savePatientToFirestore(preset);
-        }
-       });
+        PRESET_PATIENTS.forEach(preset => {
+          const existingIndex = rawList.findIndex(p => p.id === preset.id);
+          if (existingIndex === -1) {
+            rawList.push(preset);
+            savePatientToFirestore(preset);
+          }
+        });
 
         // Enrich presets with new studies/ecgs/ultrasound if updated in code
         const mergedList = rawList.map(patient => {
@@ -678,7 +673,6 @@ export default function App() {
         // "所有的抽血都會在倒數剩9分鐘的時候出來" + Dynamic delay/manual release scheduled trigger check
         setPatients(currentPatients => {
           let anyPatientChanged = false;
-          let countCompleted = 0;
           let revealedImaging: string[] = [];
           let revealedLabs: string[] = [];
 
@@ -697,10 +691,8 @@ export default function App() {
                 revealedImaging.push(`${p.name}的「${study.title}」影像`);
                 return { 
                   ...study, 
-                  visible: true, 
-                  publishMode: study.publishMode || 'timer',
-                  publishMinutesRemaining: study.publishMinutesRemaining || 9,
-                  dateTime: clinicalTime || new Date().toISOString().slice(0, 16).replace('T', ' ') 
+                  visible: true,
+                  publishMode: study.publishMode || 'timer'
                 };
               }
               return study;
@@ -716,8 +708,7 @@ export default function App() {
                 revealedLabs.push(`${p.name}的「${report.title}」抽血報告`);
                 return { 
                   ...report, 
-                  visible: true, 
-                  dateTime: clinicalTime || new Date().toISOString().slice(0, 16).replace('T', ' ') 
+                  visible: true
                 };
               }
               return report;
@@ -733,8 +724,7 @@ export default function App() {
                 revealedImaging.push(`${p.name}的「${ecg.title}」心電圖報告`);
                 return { 
                   ...ecg, 
-                  visible: true, 
-                  dateTime: clinicalTime || new Date().toISOString().slice(0, 16).replace('T', ' ') 
+                  visible: true
                 };
               }
               return ecg;
@@ -750,8 +740,7 @@ export default function App() {
                 revealedImaging.push(`${p.name}的「${ultra.title}」重點式超音波報告`);
                 return { 
                   ...ultra, 
-                  visible: true, 
-                  dateTime: clinicalTime || new Date().toISOString().slice(0, 16).replace('T', ' ') 
+                  visible: true
                 };
               }
               return ultra;
@@ -769,35 +758,8 @@ export default function App() {
                 ultrasoundReports: updatedUltrasounds
               };
             }
-
-            // 3. Auto-complete pending blood tests at 9 minutes (540s) remaining
-            if (nextVal === 540) {
-              const hasPendingBlood = p.clinicalOrders.some(o => o.status === 'PENDING' && ['CBC', 'DC', 'BIO', 'BLOOD_GAS'].includes(o.orderType));
-              if (hasPendingBlood) {
-                anyPatientChanged = true;
-                const clonedOrders = p.clinicalOrders.map(o => {
-                  const isBloodTest = ['CBC', 'DC', 'BIO', 'BLOOD_GAS'].includes(o.orderType);
-                  if (o.status === 'PENDING' && isBloodTest) {
-                    countCompleted++;
-                    return { ...o, status: 'COMPLETED' as const, countdownRemaining: 0 };
-                  }
-                  return o;
-                });
-
-                if (updatedPat === p) {
-                  updatedPat = { ...p };
-                }
-                updatedPat.clinicalOrders = clonedOrders;
-                updatedPat.labReports = [...(updatedPat.labReports || p.labReports)];
-
-                p.clinicalOrders.forEach(o => {
-                  const isBloodTest = ['CBC', 'DC', 'BIO', 'BLOOD_GAS'].includes(o.orderType);
-                  if (o.status === 'PENDING' && isBloodTest) {
-                    injectSimulatedReport(updatedPat, o.orderType, o.displayTime, o.selectedItems, o.details);
-                  }
-                });
-              }
-            }
+            // Student-ordered tests keep their normal order countdown.
+            // Scenario-specific reports are released only by publishMode/publishMinutesRemaining above.
 
             return updatedPat;
           });
@@ -830,27 +792,6 @@ export default function App() {
               }));
               return [...entries, ...log];
             });
-
-            triggerAudioNotify();
-          }
-
-          if (nextVal === 540 && countCompleted > 0) {
-            setToasts(toasts => [...toasts, {
-              id: `toast-9min-${Date.now()}`,
-              message: `📢 臨床模擬：已達倒數剩餘 9 分鐘，所有抽血項目已全數提前自動分析完成！`,
-              type: 'success'
-            }]);
-            
-            setExamLog(log => [
-              {
-                id: `log-9min-labs-${Date.now()}`,
-                timestamp: new Date().toLocaleTimeString('zh-TW', { hour12: false }),
-                timerTime: '09:00',
-                patientName: '系統',
-                action: '📢 臨床計時：倒數剩餘 9 分鐘，所有 PENDING 狀態之抽血檢體已自動發布結果完成！'
-              },
-              ...log
-            ]);
 
             triggerAudioNotify();
           }
@@ -1408,6 +1349,90 @@ export default function App() {
     setPatients(next);
   };
 
+  // Teacher controls for the 15-minute simulation
+  const handlePauseExamTimer = () => {
+    if (!examStateRef.current.examTimerActive) return;
+    const rem = examStateRef.current.examTimeRemaining;
+    examStateRef.current.examTimerActive = false;
+    examStateRef.current.startTimeMs = null;
+    examStateRef.current.durationSec = rem;
+    setExamTimerActive(false);
+    setStartTimeMs(null);
+    setDurationSec(rem);
+    const payload = { examTimerActive: false, startTimeMs: null, durationSec: rem, examTimeRemaining: rem, examLog };
+    saveExamStateToFirestore(payload);
+    broadcastLocalExamState(payload);
+    addExamLogEntry('⏸️ 教師暫停倒數計時器。');
+  };
+
+  const handleResumeExamTimer = () => {
+    const rem = examStateRef.current.examTimeRemaining;
+    if (examStateRef.current.examTimerActive || rem <= 0 || rem >= 900) return;
+    const now = Date.now();
+    examStateRef.current.examTimerActive = true;
+    examStateRef.current.startTimeMs = now;
+    examStateRef.current.durationSec = rem;
+    setExamTimerActive(true);
+    setStartTimeMs(now);
+    setDurationSec(rem);
+    const payload = { examTimerActive: true, startTimeMs: now, durationSec: rem, examTimeRemaining: rem, examLog };
+    saveExamStateToFirestore(payload);
+    broadcastLocalExamState(payload);
+    addExamLogEntry('▶️ 教師繼續倒數計時器。');
+  };
+
+  const handleStartExam = () => {
+    handleResetAllPatientsScenarios();
+    handleSetExamTimerActive(true);
+    addExamLogEntry('▶️ 教師開始 15 分鐘臨床模擬測驗。');
+  };
+
+  const handleResetExam = () => {
+    handleResetAllPatientsScenarios();
+    examStateRef.current.examTimerActive = false;
+    examStateRef.current.startTimeMs = null;
+    examStateRef.current.durationSec = 900;
+    examStateRef.current.examTimeRemaining = 900;
+    setExamTimerActive(false);
+    setStartTimeMs(null);
+    setDurationSec(900);
+    setExamTimeRemaining(900);
+    setExamLog([]);
+    const payload = { examTimerActive: false, startTimeMs: null, durationSec: 900, examTimeRemaining: 900, examLog: [] };
+    saveExamStateToFirestore(payload);
+    broadcastLocalExamState(payload);
+    setToasts(prev => [...prev, { id: `toast-exam-reset-${Date.now()}`, message: '🔄 教師已重設倒數與情境，所有定時／手動報告已重新隱藏。', type: 'info' }]);
+  };
+
+  const handleManualPublish = (kind: 'ecg' | 'cxr' | 'lab') => {
+    let publishedPatientName = '';
+    let publishedLabel = '';
+
+    setPatients(current => current.map(p => {
+      const hasTarget =
+        (kind === 'ecg' && (p.ecgReports || []).some(r => r.id === 'ecg-hr-1')) ||
+        (kind === 'cxr' && (p.imagingStudies || []).some(r => r.id === 'img-hr-cxr-correct')) ||
+        (kind === 'lab' && (p.labReports || []).some(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001'].includes(r.id)));
+      if (!hasTarget) return p;
+      publishedPatientName = p.name;
+
+      if (kind === 'ecg') {
+        publishedLabel = 'ECG';
+        return { ...p, ecgReports: (p.ecgReports || []).map(r => r.id === 'ecg-hr-1' ? { ...r, visible: true } : r) };
+      }
+      if (kind === 'cxr') {
+        publishedLabel = '正確 CXR';
+        return { ...p, imagingStudies: (p.imagingStudies || []).map(r => r.id === 'img-hr-cxr-correct' ? { ...r, visible: true } : r) };
+      }
+      publishedLabel = '10/1 正確 Lab';
+      return { ...p, labReports: (p.labReports || []).map(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001'].includes(r.id) ? { ...r, visible: true } : r) };
+    }));
+
+    setToasts(prev => [...prev, { id: `toast-manual-publish-${kind}-${Date.now()}`, message: `📢 教師已發布${publishedPatientName ? `【${publishedPatientName}】` : ''}${publishedLabel || '指定報告'}。`, type: 'success' }]);
+    addExamLogEntry(`📢 教師手動發布：${publishedLabel || '指定報告'}。`, publishedPatientName || '張清祥');
+    triggerAudioNotify();
+  };
+
   // Helpers to select active patient object safely
   const activePatient = patients.find(p => p.id === activePatientId) || null;
 
@@ -1462,7 +1487,7 @@ export default function App() {
                     倒數 {Math.floor(examTimeRemaining / 60).toString().padStart(2, '0')}:{(examTimeRemaining % 60).toString().padStart(2, '0')}
                   </span>
                 ) : (
-                  <span>倒數 15:00</span>
+                  <span>{examTimeRemaining === 900 ? '倒數 15:00' : `已暫停 ${Math.floor(examTimeRemaining / 60).toString().padStart(2, '0')}:${(examTimeRemaining % 60).toString().padStart(2, '0')}`}</span>
                 )}
               </div>
             </div>
@@ -1470,7 +1495,23 @@ export default function App() {
           </div>
         </header>
 
-
+      {/* TEACHER SIMULATION CONTROL BAR */}
+      <div className="bg-slate-900 text-white border-b border-slate-700 px-3 md:px-5 py-2 flex flex-wrap items-center gap-2 shadow-sm">
+        <span className="text-[11px] font-bold text-amber-300 mr-1">教師控制</span>
+        <button type="button" onClick={handleStartExam} disabled={examTimerActive} className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-600 disabled:text-slate-400 text-[11px] font-bold cursor-pointer disabled:cursor-not-allowed">▶ 開始 15:00</button>
+        {examTimerActive ? (
+          <button type="button" onClick={handlePauseExamTimer} className="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-500 text-[11px] font-bold cursor-pointer">⏸ 暫停</button>
+        ) : examTimeRemaining > 0 && examTimeRemaining < 900 ? (
+          <button type="button" onClick={handleResumeExamTimer} className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-[11px] font-bold cursor-pointer">▶ 繼續</button>
+        ) : null}
+        <button type="button" onClick={handleResetExam} className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-[11px] font-bold cursor-pointer">↺ 重設演練</button>
+        <span className="hidden md:inline h-5 w-px bg-slate-600 mx-1"></span>
+        <span className="text-[10px] text-slate-300">張清祥：</span>
+        <button type="button" onClick={() => handleManualPublish('ecg')} className="px-2.5 py-1 rounded bg-rose-700 hover:bg-rose-600 text-[11px] font-bold cursor-pointer">⚡ 發布 ECG</button>
+        <button type="button" onClick={() => handleManualPublish('cxr')} className="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-600 text-[11px] font-bold cursor-pointer">🩻 發布正確 CXR</button>
+        <button type="button" onClick={() => handleManualPublish('lab')} className="px-2.5 py-1 rounded bg-violet-700 hover:bg-violet-600 text-[11px] font-bold cursor-pointer">🧪 發布正確 Lab</button>
+        <span className="ml-auto text-[10px] text-slate-300 font-mono">11:00 自動錯誤 CXR ｜ 06:00 自動舊 Lab</span>
+      </div>
 
       {/* DASHBOARD WORKSPACE GRID (Sidebar & Main stage) */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden relative">
