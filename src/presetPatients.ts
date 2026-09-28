@@ -689,76 +689,129 @@ export const PRESET_PATIENTS: Patient[] = [
       }
     ],
     ultrasoundReports: [
-      {
-        id: 'ultra-hr-1',
-        title: '右下腹重點式超音波 (POCUS RLQ Appendix Target Sign)',
-        imageUrl: '/pocus/Ultrasound.png',
-        description: 'RLQ targeted ultrasound (2026-10-03 10:30:15): High-frequency linear probe examination of RLQ shows a non-compressible, blind-ended, aperistaltic tubular structure with characteristic "target sign" (bull\'s-eye appearance) in transverse view. Prominent submucosal thickening with surrounding hyperechoic inflamed mesenteric fat. Compatible with Acute Appendicitis.',
-        dateTime: '2026-10-03T10:30:15',
-        visible: true,
-        publishMode: 'immediate'
-      }
+
     ],
-    labReports: [
-      {
-        id: 'lab-hr-cbc',
-        category: 'CBC',
-        title: '血液常規檢查 (CBC) - 2026/10/03',
-        dateTime: '2026-10-03T10:20:00',
-        visible: true,
-        publishMode: 'immediate',
-        items: [
-          { name: 'WBC', value: '24,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
-          { name: 'RBC', value: '4.01', unit: '10^6/μL', referenceRange: '4.5 - 5.9', status: 'normal' },
-          { name: 'Hb', value: '9.2', unit: 'g/dL', referenceRange: 'Male 13.5 - 17.5', status: 'LOW' },
-          { name: 'Hct', value: '28.1', unit: '%', referenceRange: 'Male 41.0 - 53.0', status: 'LOW' },
-          { name: 'Platelet', value: '152,000', unit: '/μL', referenceRange: '150,000 - 400,000', status: 'normal' }
-        ]
-      },
-      {
-        id: 'lab-hr-dc',
-        category: 'DC',
-        title: '白血球分類計數 (Differential Count) - 2026/10/03',
-        dateTime: '2026-10-03T10:20:00',
-        visible: true,
-        publishMode: 'immediate',
-        items: [
-          { name: 'Neutrophil (Seg)', value: '70.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
-          { name: 'Band form', value: '8.6', unit: '%', referenceRange: '0 - 5', status: 'high' },
-          { name: 'Lymphocyte', value: '13.6', unit: '%', referenceRange: '20 - 45', status: 'low' },
-          { name: 'Monocyte', value: '5.7', unit: '%', referenceRange: '2 - 10', status: 'normal' },
-          { name: 'Eosinophil', value: '1.4', unit: '%', referenceRange: '0 - 6', status: 'normal' },
-          { name: 'Basophil', value: '0.0', unit: '%', referenceRange: '0 - 2', status: 'normal' }
-        ]
-      },
-      {
-        id: 'lab-hr-bio',
-        category: 'BIO',
-        title: '臨床生化檢驗 (BIO) - 2026/10/03',
-        dateTime: '2026-10-03T10:20:00',
-        visible: true,
-        publishMode: 'immediate',
-        items: [
-          { name: 'BUN', value: '25', unit: 'mg/dL', referenceRange: '7 - 20', status: 'High' },
-          { name: 'Creatinine', value: '2.4', unit: 'mg/dL', referenceRange: 'Male 0.7 - 1.3', status: 'high' },
-          { name: 'Na', value: '128', unit: 'mEq/L', referenceRange: '135 - 145', status: 'low' },
-          { name: 'K', value: '3.7', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'normal' },
-          { name: 'Cl', value: '102', unit: 'mEq/L', referenceRange: '98 - 107', status: 'normal' },
-          { name: 'Glucose', value: '132', unit: 'mg/dL', referenceRange: '70 - 140', status: 'normal' },
-          { name: 'AST', value: '28', unit: 'U/L', referenceRange: '10 - 40', status: 'normal' },
-          { name: 'ALT', value: '22', unit: 'U/L', referenceRange: '7 - 40', status: 'normal' },
-          { name: 'CRP', value: '31.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' },
-          { name: 'Trop-I', value: '0.02', unit: 'mg/dL', referenceRange: '0 - 0.16', status: 'normal' }
-        ]
-      }
-    ],
-    customLabReportDate: '2026-10-03 10:20',
-    customLabSettings: {
-      'WBC': { value: '24,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
-      'Neutrophil (Seg)': { value: '70.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
-      'Lymphocyte': { value: '13.6', unit: '%', referenceRange: '20 - 45', status: 'low' },
-      'CRP': { value: '31.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' }
-    },
+
+labReports: [
+  // =========================
+  // 2026/09/29 舊檢驗報告
+  // =========================
+  {
+    id: 'lab-hr-cbc-0929',
+    category: 'CBC',
+    title: '血液常規檢查 (CBC) - 2026/09/29',
+    dateTime: '2026-09-29T10:20:00',
+    visible: true,
+    publishMode: 'immediate',
+    items: [
+      { name: 'WBC', value: '14,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
+      { name: 'RBC', value: '4.01', unit: '10^6/μL', referenceRange: '4.5 - 5.9', status: 'low' },
+      { name: 'Hb', value: '10.2', unit: 'g/dL', referenceRange: 'Male 13.5 - 17.5', status: 'low' },
+      { name: 'Hct', value: '28.1', unit: '%', referenceRange: 'Male 41.0 - 53.0', status: 'low' },
+      { name: 'Platelet', value: '182,000', unit: '/μL', referenceRange: '150,000 - 400,000', status: 'normal' }
+    ]
+  },
+  {
+    id: 'lab-hr-dc-0929',
+    category: 'DC',
+    title: '白血球分類計數 (Differential Count) - 2026/09/29',
+    dateTime: '2026-09-29T10:20:00',
+    visible: true,
+    publishMode: 'immediate',
+    items: [
+      { name: 'Neutrophil (Seg)', value: '78.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
+      { name: 'Band form', value: '0.0', unit: '%', referenceRange: '0 - 5', status: 'normal' },
+      { name: 'Lymphocyte', value: '13.6', unit: '%', referenceRange: '20 - 45', status: 'low' },
+      { name: 'Monocyte', value: '5.7', unit: '%', referenceRange: '2 - 10', status: 'normal' },
+      { name: 'Eosinophil', value: '1.4', unit: '%', referenceRange: '0 - 6', status: 'normal' },
+      { name: 'Basophil', value: '0.0', unit: '%', referenceRange: '0 - 2', status: 'normal' }
+    ]
+  },
+  {
+    id: 'lab-hr-bio-0929',
+    category: 'BIO',
+    title: '臨床生化檢驗 (BIO) - 2026/09/29',
+    dateTime: '2026-09-29T10:20:00',
+    visible: true,
+    publishMode: 'immediate',
+    items: [
+      { name: 'BUN', value: '22', unit: 'mg/dL', referenceRange: '7 - 20', status: 'high' },
+      { name: 'Creatinine', value: '1.8', unit: 'mg/dL', referenceRange: 'Male 0.7 - 1.3', status: 'high' },
+      { name: 'Na', value: '136', unit: 'mEq/L', referenceRange: '135 - 145', status: 'normal' },
+      { name: 'K', value: '6.7', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'high' },
+      { name: 'Cl', value: '102', unit: 'mEq/L', referenceRange: '98 - 107', status: 'normal' },
+      { name: 'Glucose', value: '43', unit: 'mg/dL', referenceRange: '70 - 140', status: 'low' },
+      { name: 'AST', value: '27', unit: 'U/L', referenceRange: '10 - 40', status: 'normal' },
+      { name: 'ALT', value: '21', unit: 'U/L', referenceRange: '7 - 40', status: 'normal' },
+      { name: 'CRP', value: '5.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' },
+      { name: 'Trop-I', value: '0.02', unit: 'mg/dL', referenceRange: '0 - 0.16', status: 'normal' }
+    ]
+  },
+
+  // =========================
+  // 2026/10/01 正確檢驗報告
+  // =========================
+  {
+    id: 'lab-hr-cbc-1001',
+    category: 'CBC',
+    title: '血液常規檢查 (CBC) - 2026/10/01',
+    dateTime: '2026-10-01T10:20:00',
+    visible: true,
+    publishMode: 'immediate',
+    items: [
+      { name: 'WBC', value: '24,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
+      { name: 'RBC', value: '4.01', unit: '10^6/μL', referenceRange: '4.5 - 5.9', status: 'low' },
+      { name: 'Hb', value: '9.2', unit: 'g/dL', referenceRange: 'Male 13.5 - 17.5', status: 'low' },
+      { name: 'Hct', value: '28.1', unit: '%', referenceRange: 'Male 41.0 - 53.0', status: 'low' },
+      { name: 'Platelet', value: '152,000', unit: '/μL', referenceRange: '150,000 - 400,000', status: 'normal' }
+    ]
+  },
+  {
+    id: 'lab-hr-dc-1001',
+    category: 'DC',
+    title: '白血球分類計數 (Differential Count) - 2026/10/01',
+    dateTime: '2026-10-01T10:20:00',
+    visible: true,
+    publishMode: 'immediate',
+    items: [
+      { name: 'Neutrophil (Seg)', value: '70.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
+      { name: 'Band form', value: '8.6', unit: '%', referenceRange: '0 - 5', status: 'high' },
+      { name: 'Lymphocyte', value: '13.6', unit: '%', referenceRange: '20 - 45', status: 'low' },
+      { name: 'Monocyte', value: '5.7', unit: '%', referenceRange: '2 - 10', status: 'normal' },
+      { name: 'Eosinophil', value: '1.4', unit: '%', referenceRange: '0 - 6', status: 'normal' },
+      { name: 'Basophil', value: '0.0', unit: '%', referenceRange: '0 - 2', status: 'normal' }
+    ]
+  },
+  {
+    id: 'lab-hr-bio-1001',
+    category: 'BIO',
+    title: '臨床生化檢驗 (BIO) - 2026/10/01',
+    dateTime: '2026-10-01T10:20:00',
+    visible: true,
+    publishMode: 'immediate',
+    items: [
+      { name: 'BUN', value: '25', unit: 'mg/dL', referenceRange: '7 - 20', status: 'high' },
+      { name: 'Creatinine', value: '2.4', unit: 'mg/dL', referenceRange: 'Male 0.7 - 1.3', status: 'high' },
+      { name: 'Na', value: '128', unit: 'mEq/L', referenceRange: '135 - 145', status: 'low' },
+      { name: 'K', value: '3.7', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'normal' },
+      { name: 'Cl', value: '102', unit: 'mEq/L', referenceRange: '98 - 107', status: 'normal' },
+      { name: 'Glucose', value: '132', unit: 'mg/dL', referenceRange: '70 - 140', status: 'normal' },
+      { name: 'AST', value: '28', unit: 'U/L', referenceRange: '10 - 40', status: 'normal' },
+      { name: 'ALT', value: '22', unit: 'U/L', referenceRange: '7 - 40', status: 'normal' },
+      { name: 'CRP', value: '31.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' },
+      { name: 'Trop-I', value: '0.02', unit: 'mg/dL', referenceRange: '0 - 0.16', status: 'normal' }
+    ]
+  }
+],
+
+customLabReportDate: '2026-09-29 10:20',
+
+customLabSettings: {
+  'WBC': { value: '14,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
+  'Neutrophil (Seg)': { value: '78.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
+  'Lymphocyte': { value: '13.6', unit: '%', referenceRange: '20 - 45', status: 'low' },
+  'CRP': { value: '5.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' }
+},
     clinicalOrders: [],
     education: '國中畢業',
     religion: '佛教',
