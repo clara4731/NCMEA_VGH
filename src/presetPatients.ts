@@ -794,19 +794,19 @@ labReports: [
       { name: 'CRP', value: '31.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' },
       { name: 'Trop-I', value: '0.02', unit: 'mg/dL', referenceRange: '0 - 0.16', status: 'normal' }
     ]
-  }
-],{
-        id: 'lab-4-5',
+  },
+  {
+        id: 'lab-hr-abg-1001',
         category: 'BLOOD_GAS',
         title: '動脈血液氣體分析 (ABG) - 2026/10/01',
-        dateTime: '2026-10-03T09:20:00',
+        dateTime: '2026-10-01T09:20:00',
         visible: false,
         publishMode: 'manual',
         items: [
           { name: 'pH', value: '7.182', unit: '', referenceRange: '7.35 - 7.45', status: 'low' },
           { name: 'PaCO2', value: '32.8', unit: 'mmHg', referenceRange: '35 - 45', status: 'low' },
           { name: 'PaO2', value: '62.1', unit: 'mmHg', referenceRange: '80 - 100', status: 'low' },
-          { name: 'HCO3-', value: '14.7.0', unit: 'mEq/L', referenceRange: '22 - 26', status: 'low' },
+          { name: 'HCO3-', value: '14.7', unit: 'mEq/L', referenceRange: '22 - 26', status: 'low' },
           { name: 'Base excess', value: '-9.2', unit: 'mEq/L', referenceRange: '-2 to +2', status: 'low' },
           { name: 'SaO2', value: '88.7', unit: '%', referenceRange: '95 - 100', status: 'low' },
           { name: 'Lactate', value: '5.2', unit: 'mmol/L', referenceRange: '0.5 - 2.2', status: 'high' }
