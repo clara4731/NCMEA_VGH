@@ -869,9 +869,9 @@ export default function App() {
 
             // Trigger clinical alert toast
             const orderLabel = order.orderType === 'CT' ? '【影像科檢查】' : order.orderType === 'MED' ? '【臨床醫囑給藥】' : '【實驗室檢驗】';
-            const alertMsg = order.orderType === 'MED' 
-              ? `🎉 點滴與口服藥囑已成功傳輸完成！病患 ${patient.name} 開立的藥品已由電子藥局配送給藥完畢！`
-              : `🎉 ${orderLabel} 病患 ${patient.name} 的 ${order.orderType} 檢體報告已快速 analysis 完畢，結果送達診台！`;
+            const alertMsg = order.orderType === 'MED'
+              ? `🎉 點滴與口服藥囑已成功傳輸完成！`
+              : `🔔 有新的檢查報告已發布。`;
             
             setToasts(prev => [...prev, { id: `toast-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, message: alertMsg, type: 'success' }]);
             triggerAudioNotify();
