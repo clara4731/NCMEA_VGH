@@ -520,7 +520,8 @@ export const PRESET_PATIENTS: Patient[] = [
         icdCode: 'J18.9',
         recordedAt: '2026-09-29T10:15:00',
         notes: 'Clinical presentation with fever and hypoxemia, with pulmonary infiltrates on chest X-ray, consistent with pneumonia.'
-      },
+      }
+      ],
     prescriptions: [
       {
         id: 'rx-hr-1',
