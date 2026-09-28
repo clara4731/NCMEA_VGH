@@ -1420,7 +1420,7 @@ export default function App() {
       const hasTarget =
         (kind === 'ecg' && (p.ecgReports || []).some(r => r.id === 'ecg-hr-1')) ||
         (kind === 'cxr' && (p.imagingStudies || []).some(r => r.id === 'img-hr-cxr-correct')) ||
-        (kind === 'lab' && (p.labReports || []).some(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001'].includes(r.id)));
+        (kind === 'lab' && (p.labReports || []).some(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001', 'lab-hr-abg-1001'].includes(r.id)));
       if (!hasTarget) return p;
       publishedPatientName = p.name;
 
@@ -1433,7 +1433,7 @@ export default function App() {
         return { ...p, imagingStudies: (p.imagingStudies || []).map(r => r.id === 'img-hr-cxr-correct' ? { ...r, visible: true } : r) };
       }
       publishedLabel = '檢驗報告';
-      return { ...p, labReports: (p.labReports || []).map(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001'].includes(r.id) ? { ...r, visible: true } : r) };
+      return { ...p, labReports: (p.labReports || []).map(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001', 'lab-hr-abg-1001'].includes(r.id) ? { ...r, visible: true } : r) };
     }));
 
     setToasts(prev => [...prev, { id: `toast-manual-publish-${kind}-${Date.now()}`, message: `🔔 ${publishedPatientName ? `【${publishedPatientName}】` : ''}有新的${publishedLabel || '檢查報告'}已發布。`, type: 'success' }]);
