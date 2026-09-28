@@ -747,7 +747,7 @@ export const PRESET_PATIENTS: Patient[] = [
           { name: 'Glucose', value: '132', unit: 'mg/dL', referenceRange: '70 - 140', status: 'normal' },
           { name: 'AST', value: '28', unit: 'U/L', referenceRange: '10 - 40', status: 'normal' },
           { name: 'ALT', value: '22', unit: 'U/L', referenceRange: '7 - 40', status: 'normal' },
-          { name: 'CRP', value: '31.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' }
+          { name: 'CRP', value: '31.6', unit: 'mg/dL', referenceRange: '< 0.5', status: 'high' },
           { name: 'Trop-I', value: '0.02', unit: 'mg/dL', referenceRange: '0 - 0.16', status: 'normal' }
         ]
       }
