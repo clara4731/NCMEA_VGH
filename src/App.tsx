@@ -777,7 +777,7 @@ export default function App() {
             [...revealedImaging, ...revealedLabs].forEach(item => {
               setToasts(toasts => [...toasts, {
                 id: `toast-reveal-${Date.now()}-${Math.random()}`,
-                message: `📢 臨床模擬：倒數 ${timerStr}，${item} 已自動發布！`,
+                message: `🔔 有新的檢查報告已發布。`,
                 type: 'success'
               }]);
             });
@@ -1417,18 +1417,18 @@ export default function App() {
       publishedPatientName = p.name;
 
       if (kind === 'ecg') {
-        publishedLabel = 'ECG';
+        publishedLabel = '心電圖檢查';
         return { ...p, ecgReports: (p.ecgReports || []).map(r => r.id === 'ecg-hr-1' ? { ...r, visible: true } : r) };
       }
       if (kind === 'cxr') {
-        publishedLabel = '正確 CXR';
+        publishedLabel = '影像檢查報告';
         return { ...p, imagingStudies: (p.imagingStudies || []).map(r => r.id === 'img-hr-cxr-correct' ? { ...r, visible: true } : r) };
       }
-      publishedLabel = '10/1 正確 Lab';
+      publishedLabel = '檢驗報告';
       return { ...p, labReports: (p.labReports || []).map(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001'].includes(r.id) ? { ...r, visible: true } : r) };
     }));
 
-    setToasts(prev => [...prev, { id: `toast-manual-publish-${kind}-${Date.now()}`, message: `📢 教師已發布${publishedPatientName ? `【${publishedPatientName}】` : ''}${publishedLabel || '指定報告'}。`, type: 'success' }]);
+    setToasts(prev => [...prev, { id: `toast-manual-publish-${kind}-${Date.now()}`, message: `🔔 ${publishedPatientName ? `【${publishedPatientName}】` : ''}有新的${publishedLabel || '檢查報告'}已發布。`, type: 'success' }]);
     addExamLogEntry(`📢 教師手動發布：${publishedLabel || '指定報告'}。`, publishedPatientName || '張清祥');
     triggerAudioNotify();
   };
@@ -1494,24 +1494,6 @@ export default function App() {
 
           </div>
         </header>
-
-      {/* TEACHER SIMULATION CONTROL BAR */}
-      <div className="bg-slate-900 text-white border-b border-slate-700 px-3 md:px-5 py-2 flex flex-wrap items-center gap-2 shadow-sm">
-        <span className="text-[11px] font-bold text-amber-300 mr-1">教師控制</span>
-        <button type="button" onClick={handleStartExam} disabled={examTimerActive} className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-600 disabled:text-slate-400 text-[11px] font-bold cursor-pointer disabled:cursor-not-allowed">▶ 開始 15:00</button>
-        {examTimerActive ? (
-          <button type="button" onClick={handlePauseExamTimer} className="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-500 text-[11px] font-bold cursor-pointer">⏸ 暫停</button>
-        ) : examTimeRemaining > 0 && examTimeRemaining < 900 ? (
-          <button type="button" onClick={handleResumeExamTimer} className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-[11px] font-bold cursor-pointer">▶ 繼續</button>
-        ) : null}
-        <button type="button" onClick={handleResetExam} className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-[11px] font-bold cursor-pointer">↺ 重設演練</button>
-        <span className="hidden md:inline h-5 w-px bg-slate-600 mx-1"></span>
-        <span className="text-[10px] text-slate-300">張清祥：</span>
-        <button type="button" onClick={() => handleManualPublish('ecg')} className="px-2.5 py-1 rounded bg-rose-700 hover:bg-rose-600 text-[11px] font-bold cursor-pointer">⚡ 發布 ECG</button>
-        <button type="button" onClick={() => handleManualPublish('cxr')} className="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-600 text-[11px] font-bold cursor-pointer">🩻 發布 CXR</button>
-        <button type="button" onClick={() => handleManualPublish('lab')} className="px-2.5 py-1 rounded bg-violet-700 hover:bg-violet-600 text-[11px] font-bold cursor-pointer">🧪 發布 Lab</button>
-        <span className="ml-auto text-[10px] text-slate-300 font-mono">
-      </div>
 
       {/* DASHBOARD WORKSPACE GRID (Sidebar & Main stage) */}
       <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden relative">
@@ -1726,6 +1708,23 @@ export default function App() {
           )}
         </div>
 
+      </div>
+
+      {/* TEACHER SIMULATION CONTROL BAR */}
+      <div className="bg-slate-900 text-white border-t border-slate-700 px-3 md:px-5 py-2 flex flex-wrap items-center gap-2 shadow-sm">
+        <span className="text-[11px] font-bold text-amber-300 mr-1">教師控制</span>
+        <button type="button" onClick={handleStartExam} disabled={examTimerActive} className="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-600 disabled:text-slate-400 text-[11px] font-bold cursor-pointer disabled:cursor-not-allowed">▶ 開始 15:00</button>
+        {examTimerActive ? (
+          <button type="button" onClick={handlePauseExamTimer} className="px-2.5 py-1 rounded bg-amber-600 hover:bg-amber-500 text-[11px] font-bold cursor-pointer">⏸ 暫停</button>
+        ) : examTimeRemaining > 0 && examTimeRemaining < 900 ? (
+          <button type="button" onClick={handleResumeExamTimer} className="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-[11px] font-bold cursor-pointer">▶ 繼續</button>
+        ) : null}
+        <button type="button" onClick={handleResetExam} className="px-2.5 py-1 rounded bg-slate-700 hover:bg-slate-600 text-[11px] font-bold cursor-pointer">↺ 重設演練</button>
+        <span className="hidden md:inline h-5 w-px bg-slate-600 mx-1"></span>
+        <span className="text-[10px] text-slate-300">張清祥：</span>
+        <button type="button" onClick={() => handleManualPublish('ecg')} className="px-2.5 py-1 rounded bg-rose-700 hover:bg-rose-600 text-[11px] font-bold cursor-pointer">⚡ 發布 ECG</button>
+        <button type="button" onClick={() => handleManualPublish('cxr')} className="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-600 text-[11px] font-bold cursor-pointer">🩻 發布 CXR</button>
+        <button type="button" onClick={() => handleManualPublish('lab')} className="px-2.5 py-1 rounded bg-violet-700 hover:bg-violet-600 text-[11px] font-bold cursor-pointer">🧪 發布 Lab</button>
       </div>
 
       {/* Footer Status Bar matching Professional Polish design exactly */}
