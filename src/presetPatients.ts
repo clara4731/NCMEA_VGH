@@ -667,7 +667,7 @@ imagingStudies: [
     publishMode: 'manual'
   },
   {
-    id: 'img-hr-cxr-manual-2',
+    id: 'img-hr-cxr-correct',
     title: '胸部 X 光檢查 (Chest X-Ray)',
     studyType: 'XRAY',
     imageUrl: '/cxr/cxr2_correct.jpg',
