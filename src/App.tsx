@@ -1436,7 +1436,7 @@ export default function App() {
       const targetPatient = patients.find(p =>
         (p.imagingStudies || []).some(r =>
           r.id === 'img-hr-cxr-manual-1' ||
-          r.id === 'img-hr-cxr-manual-2'
+          r.id === 'img-hr-cxr-correct'
         )
       );
 
@@ -1447,7 +1447,7 @@ export default function App() {
       );
 
       const manual2 = (targetPatient.imagingStudies || []).find(
-        r => r.id === 'img-hr-cxr-manual-2'
+        r => r.id === 'img-hr-cxr-correct'
       );
 
       // 第一次按：發布 manual-1
@@ -1458,7 +1458,7 @@ export default function App() {
       if (manual1?.visible !== true) {
         targetCxrId = 'img-hr-cxr-manual-1';
       } else if (manual2?.visible !== true) {
-        targetCxrId = 'img-hr-cxr-manual-2';
+        targetCxrId = 'img-hr-cxr-correct';
       } else {
         return;
       }
