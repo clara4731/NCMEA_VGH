@@ -1430,23 +1430,13 @@ export default function App() {
     let targetPatientId: string | null = null;
     let publishedPatientName = '';
     let publishedLabel = '';
-    let cxrTargetId: string | null = null;
 
-    // First determine whether this click actually has a hidden report to publish.
-    // Only a successful publication should show the top-right notification.
-    if (kind === 'ecg') {
-      const targetPatient = patients.find(p =>
-        (p.ecgReports || []).some(r => r.id === 'ecg-hr-1' && !r.visible)
-      );
-      if (!targetPatient) return;
-
-      targetPatientId = targetPatient.id;
-      publishedPatientName = targetPatient.name;
-      publishedLabel = '心電圖檢查';
-    } else if (kind === 'cxr') {
+    // CXR uses one button for two sequential manual reports.
+    // 1st click -> manual-1, 2nd click -> manual-2, later clicks -> no action.
+    if (kind === 'cxr') {
       const targetPatient = patients.find(p =>
         (p.imagingStudies || []).some(r =>
-          ['img-hr-cxr-manual-1', 'img-hr-cxr-manual-2'].includes(r.id)
+          r.id === 'img-hr-cxr-manual-1' || r.id === 'img-hr-cxr-manual-2'
         )
       );
       if (!targetPatient) return;
@@ -1458,19 +1448,59 @@ export default function App() {
         r => r.id === 'img-hr-cxr-manual-2'
       );
 
-      // The same CXR button publishes manual-1 first, then manual-2.
+      let targetCxrId: string | null = null;
       if (manual1 && !manual1.visible) {
-        cxrTargetId = 'img-hr-cxr-manual-1';
+        targetCxrId = 'img-hr-cxr-manual-1';
       } else if (manual2 && !manual2.visible) {
-        cxrTargetId = 'img-hr-cxr-manual-2';
+        targetCxrId = 'img-hr-cxr-manual-2';
       } else {
         return;
       }
 
+      const updatedPatient = {
+        ...targetPatient,
+        imagingStudies: (targetPatient.imagingStudies || []).map(r =>
+          r.id === targetCxrId ? { ...r, visible: true } : r
+        )
+      };
+
+      // Update the local cache before writing so the Firestore listener will not
+      // immediately treat the same change as another local modification.
+      lastSyncedPatientsRef.current[targetPatient.id] = JSON.stringify(updatedPatient);
+      setPatients(current =>
+        current.map(p => p.id === targetPatient.id ? updatedPatient : p)
+      );
+      savePatientToFirestore(updatedPatient);
+
+      setToasts(prev => [...prev, {
+        id: `toast-manual-publish-cxr-${Date.now()}`,
+        message: '🔔 有新的影像檢查報告已發布。',
+        type: 'success'
+      }]);
+
+      addExamLogEntry(
+        '📢 教師手動發布：影像檢查報告。',
+        targetPatient.name
+      );
+
+      triggerAudioNotify();
+      return;
+    }
+
+    // ECG
+    if (kind === 'ecg') {
+      const targetPatient = patients.find(p =>
+        (p.ecgReports || []).some(r => r.id === 'ecg-hr-1' && !r.visible)
+      );
+      if (!targetPatient) return;
+
       targetPatientId = targetPatient.id;
       publishedPatientName = targetPatient.name;
-      publishedLabel = '影像檢查報告';
-    } else {
+      publishedLabel = '心電圖檢查';
+    }
+
+    // Lab
+    if (kind === 'lab') {
       const labIds = [
         'lab-hr-cbc-1001',
         'lab-hr-dc-1001',
@@ -1487,6 +1517,8 @@ export default function App() {
       publishedLabel = '檢驗報告';
     }
 
+    if (!targetPatientId) return;
+
     setPatients(current => current.map(p => {
       if (p.id !== targetPatientId) return p;
 
@@ -1495,15 +1527,6 @@ export default function App() {
           ...p,
           ecgReports: (p.ecgReports || []).map(r =>
             r.id === 'ecg-hr-1' ? { ...r, visible: true } : r
-          )
-        };
-      }
-
-      if (kind === 'cxr' && cxrTargetId) {
-        return {
-          ...p,
-          imagingStudies: (p.imagingStudies || []).map(r =>
-            r.id === cxrTargetId ? { ...r, visible: true } : r
           )
         };
       }
