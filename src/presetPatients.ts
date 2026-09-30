@@ -693,7 +693,7 @@ labReports: [
     dateTime: '2026-09-29T10:20:00',
     visible: false,
     publishMode: 'timer',
-    publishMinutesRemaining: 6,
+    publishMinutesRemaining: 8,
     items: [
       { name: 'WBC', value: '14,090', unit: '/μL', referenceRange: '4,000 - 10,000', status: 'high' },
       { name: 'RBC', value: '4.01', unit: '10^6/μL', referenceRange: '4.5 - 5.9', status: 'low' },
@@ -709,7 +709,7 @@ labReports: [
     dateTime: '2026-09-29T10:20:00',
     visible: false,
     publishMode: 'timer',
-    publishMinutesRemaining: 6,
+    publishMinutesRemaining: 8,
     items: [
       { name: 'Neutrophil (Seg)', value: '78.7', unit: '%', referenceRange: '40 - 70', status: 'high' },
       { name: 'Band form', value: '0.0', unit: '%', referenceRange: '0 - 5', status: 'normal' },
@@ -726,12 +726,12 @@ labReports: [
     dateTime: '2026-09-29T10:20:00',
     visible: false,
     publishMode: 'timer',
-    publishMinutesRemaining: 6,
+    publishMinutesRemaining: 8,
     items: [
       { name: 'BUN', value: '22', unit: 'mg/dL', referenceRange: '7 - 20', status: 'high' },
       { name: 'Creatinine', value: '1.8', unit: 'mg/dL', referenceRange: 'Male 0.7 - 1.3', status: 'high' },
       { name: 'Na', value: '136', unit: 'mEq/L', referenceRange: '135 - 145', status: 'normal' },
-      { name: 'K', value: '6.7', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'high' },
+      { name: 'K', value: '3.7', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'normal' },
       { name: 'Cl', value: '102', unit: 'mEq/L', referenceRange: '98 - 107', status: 'normal' },
       { name: 'Glucose', value: '43', unit: 'mg/dL', referenceRange: '70 - 140', status: 'low' },
       { name: 'AST', value: '27', unit: 'U/L', referenceRange: '10 - 40', status: 'normal' },
@@ -786,7 +786,7 @@ labReports: [
       { name: 'BUN', value: '25', unit: 'mg/dL', referenceRange: '7 - 20', status: 'high' },
       { name: 'Creatinine', value: '2.4', unit: 'mg/dL', referenceRange: 'Male 0.7 - 1.3', status: 'high' },
       { name: 'Na', value: '128', unit: 'mEq/L', referenceRange: '135 - 145', status: 'low' },
-      { name: 'K', value: '3.7', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'normal' },
+      { name: 'K', value: '6.2', unit: 'mEq/L', referenceRange: '3.5 - 5.1', status: 'high' },
       { name: 'Cl', value: '102', unit: 'mEq/L', referenceRange: '98 - 107', status: 'normal' },
       { name: 'Glucose', value: '132', unit: 'mg/dL', referenceRange: '70 - 140', status: 'normal' },
       { name: 'AST', value: '28', unit: 'U/L', referenceRange: '10 - 40', status: 'normal' },
@@ -835,7 +835,7 @@ customLabSettings: {
     familySupport: '家屬固定探視，主要由養護機構照護人員協助日常生活照護',
     chiefComplaint: '意識變差、發燒、呼吸淺快及低血氧',
     presentIllness: '患者平時居住於養護機構，以鼻胃管灌食。昨日開始出現嗜睡，灌食後偶有嗆咳情形；今早發現意識變差、發燒、呼吸淺快，SpO₂ 85%，由養護機構送至本院急診，目前已追蹤胸部 X 光（CXR）。',
-    pastMedicalHistory: 'DM、HTN、CAD s/p stent、Old CVA、Asthma、COPD。Old CVA 後右側肢體無力。過敏史：無。',
+    pastMedicalHistory: 'DM、HTN、CAD s/p stent、Old CVA、CKD stage III、COPD。Old CVA 後右側肢體無力。過敏史：無。',
     familyHistory: '父母已歿，無特殊家族遺傳疾病史',
     physicalStatus: '意識狀態較平時改變，呈嗜睡，發燒、呼吸淺快，SpO₂ 85%。Old CVA 後右側肢體無力，鼻胃管留置中（16 Fr）。'
   }
