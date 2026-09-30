@@ -400,121 +400,89 @@ export default function App() {
           }
         });
 
-        // Enrich presets with new studies/ecgs/ultrasound/labs if updated in code
+        // Keep preset case content in sync with Firestore while preserving live simulation state.
+        // This lets edits in presetPatients.ts (history, lab values, publish time, titles, etc.)
+        // update existing patients without resetting whether a report is currently visible.
         const mergedList = rawList.map(patient => {
           const presetMatch = PRESET_PATIENTS.find(p => p.id === patient.id);
+          if (!presetMatch) return patient;
+
           let imagingStudies = patient.imagingStudies || [];
           let ecgReports = patient.ecgReports || [];
           let ultrasoundReports = patient.ultrasoundReports || [];
           let labReports = patient.labReports || [];
 
-          if (presetMatch) {
-            let updated = false;
-            presetMatch.imagingStudies?.forEach(presetStudy => {
-              const existingIdx = imagingStudies.findIndex(s => s.id === presetStudy.id);
-              if (existingIdx !== -1) {
-                if (
-                  imagingStudies[existingIdx].dateTime !== presetStudy.dateTime ||
-                  imagingStudies[existingIdx].title !== presetStudy.title ||
-                  imagingStudies[existingIdx].description !== presetStudy.description
-                ) {
-                  imagingStudies[existingIdx] = {
-                    ...imagingStudies[existingIdx],
-                    title: presetStudy.title,
-                    dateTime: presetStudy.dateTime,
-                    description: presetStudy.description,
-                    imageUrl: presetStudy.imageUrl
-                  };
-                  updated = true;
-                }
-              } else if (!imagingStudies.some(s => s.imageUrl === presetStudy.imageUrl)) {
-                imagingStudies = [presetStudy, ...imagingStudies];
-                updated = true;
-              }
-            });
-            presetMatch.ecgReports?.forEach(presetEcg => {
-              const existingIdx = ecgReports.findIndex(e => e.id === presetEcg.id);
-              if (existingIdx !== -1) {
-                if (
-                  ecgReports[existingIdx].dateTime !== presetEcg.dateTime ||
-                  ecgReports[existingIdx].title !== presetEcg.title ||
-                  ecgReports[existingIdx].description !== presetEcg.description
-                ) {
-                  ecgReports[existingIdx] = {
-                    ...ecgReports[existingIdx],
-                    title: presetEcg.title,
-                    dateTime: presetEcg.dateTime,
-                    description: presetEcg.description,
-                    imageUrl: presetEcg.imageUrl
-                  };
-                  updated = true;
-                }
-              } else if (!ecgReports.some(e => e.imageUrl === presetEcg.imageUrl)) {
-                ecgReports = [presetEcg, ...ecgReports];
-                updated = true;
-              }
-            });
-            presetMatch.ultrasoundReports?.forEach(presetUltra => {
-              const existingIdx = ultrasoundReports.findIndex(u => u.id === presetUltra.id);
-              if (existingIdx !== -1) {
-                if (
-                  ultrasoundReports[existingIdx].dateTime !== presetUltra.dateTime ||
-                  ultrasoundReports[existingIdx].title !== presetUltra.title ||
-                  ultrasoundReports[existingIdx].description !== presetUltra.description
-                ) {
-                  ultrasoundReports[existingIdx] = {
-                    ...ultrasoundReports[existingIdx],
-                    title: presetUltra.title,
-                    dateTime: presetUltra.dateTime,
-                    description: presetUltra.description,
-                    imageUrl: presetUltra.imageUrl
-                  };
-                  updated = true;
-                }
-              } else if (!ultrasoundReports.some(u => u.imageUrl === presetUltra.imageUrl)) {
-                ultrasoundReports = [presetUltra, ...ultrasoundReports];
-                updated = true;
-              }
-            });
-
-            // Add newly introduced preset lab reports (for example ABG) without
-            // overwriting the live visible/hidden state of reports already in Firestore.
-            presetMatch.labReports?.forEach(presetLab => {
-              const existingIdx = labReports.findIndex(lab => lab.id === presetLab.id);
-              if (existingIdx === -1) {
-                labReports = [...labReports, presetLab];
-                updated = true;
-              }
-            });
-
-            if (presetMatch.prescriptions && JSON.stringify(patient.prescriptions || []) !== JSON.stringify(presetMatch.prescriptions)) {
-              updated = true;
+          // Sync preset imaging content/settings, but preserve the current visible state.
+          presetMatch.imagingStudies?.forEach(presetStudy => {
+            const existingIdx = imagingStudies.findIndex(s => s.id === presetStudy.id);
+            if (existingIdx !== -1) {
+              const existing = imagingStudies[existingIdx];
+              imagingStudies = imagingStudies.map((study, idx) =>
+                idx === existingIdx ? { ...presetStudy, visible: existing.visible } : study
+              );
+            } else if (!imagingStudies.some(s => s.imageUrl === presetStudy.imageUrl)) {
+              imagingStudies = [presetStudy, ...imagingStudies];
             }
+          });
 
-            if (updated) {
-              const enrichedPatient = {
-                ...patient,
-                imagingStudies,
-                ecgReports,
-                ultrasoundReports,
-                labReports,
-                prescriptions: presetMatch.prescriptions ?? patient.prescriptions ?? []
-              };
-              savePatientToFirestore(enrichedPatient);
-              return enrichedPatient;
+          // Sync preset ECG content/settings, but preserve the current visible state.
+          presetMatch.ecgReports?.forEach(presetEcg => {
+            const existingIdx = ecgReports.findIndex(e => e.id === presetEcg.id);
+            if (existingIdx !== -1) {
+              const existing = ecgReports[existingIdx];
+              ecgReports = ecgReports.map((ecg, idx) =>
+                idx === existingIdx ? { ...presetEcg, visible: existing.visible } : ecg
+              );
+            } else if (!ecgReports.some(e => e.imageUrl === presetEcg.imageUrl)) {
+              ecgReports = [presetEcg, ...ecgReports];
             }
-          }
+          });
 
-          return {
+          // Sync preset ultrasound content/settings, but preserve the current visible state.
+          presetMatch.ultrasoundReports?.forEach(presetUltra => {
+            const existingIdx = ultrasoundReports.findIndex(u => u.id === presetUltra.id);
+            if (existingIdx !== -1) {
+              const existing = ultrasoundReports[existingIdx];
+              ultrasoundReports = ultrasoundReports.map((ultra, idx) =>
+                idx === existingIdx ? { ...presetUltra, visible: existing.visible } : ultra
+              );
+            } else if (!ultrasoundReports.some(u => u.imageUrl === presetUltra.imageUrl)) {
+              ultrasoundReports = [presetUltra, ...ultrasoundReports];
+            }
+          });
+
+          // Sync preset lab values/settings (including publishMinutesRemaining), while
+          // preserving the current visible state. Student-created injected reports remain untouched.
+          presetMatch.labReports?.forEach(presetLab => {
+            const existingIdx = labReports.findIndex(lab => lab.id === presetLab.id);
+            if (existingIdx !== -1) {
+              const existing = labReports[existingIdx];
+              labReports = labReports.map((lab, idx) =>
+                idx === existingIdx ? { ...presetLab, visible: existing.visible } : lab
+              );
+            } else {
+              labReports = [...labReports, presetLab];
+            }
+          });
+
+          // Preset fields are the source of truth for fixed case content. Preserve only
+          // live/runtime fields that learners or the timer can change during a scenario.
+          const enrichedPatient: Patient = {
             ...patient,
+            ...presetMatch,
             imagingStudies,
             ecgReports,
             ultrasoundReports,
             labReports,
-            // Preset medication history is static case data. Keep it in sync even when
-            // an older Firestore patient document was created before medications were added.
-            prescriptions: presetMatch?.prescriptions ?? patient.prescriptions ?? []
+            clinicalOrders: patient.clinicalOrders || [],
+            prescriptions: presetMatch.prescriptions ?? patient.prescriptions ?? []
           };
+
+          if (JSON.stringify(enrichedPatient) !== JSON.stringify(patient)) {
+            savePatientToFirestore(enrichedPatient);
+          }
+
+          return enrichedPatient;
         });
 
         // Cache current patient state so we do not trigger extra Firestore writes
