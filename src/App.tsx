@@ -1427,42 +1427,114 @@ export default function App() {
   };
 
   const handleManualPublish = (kind: 'ecg' | 'cxr' | 'lab') => {
+    let targetPatientId: string | null = null;
     let publishedPatientName = '';
     let publishedLabel = '';
+    let cxrTargetId: string | null = null;
+
+    // First determine whether this click actually has a hidden report to publish.
+    // Only a successful publication should show the top-right notification.
+    if (kind === 'ecg') {
+      const targetPatient = patients.find(p =>
+        (p.ecgReports || []).some(r => r.id === 'ecg-hr-1' && !r.visible)
+      );
+      if (!targetPatient) return;
+
+      targetPatientId = targetPatient.id;
+      publishedPatientName = targetPatient.name;
+      publishedLabel = '心電圖檢查';
+    } else if (kind === 'cxr') {
+      const targetPatient = patients.find(p =>
+        (p.imagingStudies || []).some(r =>
+          ['img-hr-cxr-manual-1', 'img-hr-cxr-manual-2'].includes(r.id)
+        )
+      );
+      if (!targetPatient) return;
+
+      const manual1 = (targetPatient.imagingStudies || []).find(
+        r => r.id === 'img-hr-cxr-manual-1'
+      );
+      const manual2 = (targetPatient.imagingStudies || []).find(
+        r => r.id === 'img-hr-cxr-manual-2'
+      );
+
+      // The same CXR button publishes manual-1 first, then manual-2.
+      if (manual1 && !manual1.visible) {
+        cxrTargetId = 'img-hr-cxr-manual-1';
+      } else if (manual2 && !manual2.visible) {
+        cxrTargetId = 'img-hr-cxr-manual-2';
+      } else {
+        return;
+      }
+
+      targetPatientId = targetPatient.id;
+      publishedPatientName = targetPatient.name;
+      publishedLabel = '影像檢查報告';
+    } else {
+      const labIds = [
+        'lab-hr-cbc-1001',
+        'lab-hr-dc-1001',
+        'lab-hr-bio-1001',
+        'lab-hr-abg-1001'
+      ];
+      const targetPatient = patients.find(p =>
+        (p.labReports || []).some(r => labIds.includes(r.id) && !r.visible)
+      );
+      if (!targetPatient) return;
+
+      targetPatientId = targetPatient.id;
+      publishedPatientName = targetPatient.name;
+      publishedLabel = '檢驗報告';
+    }
 
     setPatients(current => current.map(p => {
-      const hasTarget =
-        (kind === 'ecg' && (p.ecgReports || []).some(r => r.id === 'ecg-hr-1')) ||
-        (kind === 'cxr' && (p.imagingStudies || []).some(r => r.id === 'img-hr-cxr-correct')) ||
-        (kind === 'lab' && (p.labReports || []).some(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001', 'lab-hr-abg-1001'].includes(r.id)));
-      if (!hasTarget) return p;
-      publishedPatientName = p.name;
+      if (p.id !== targetPatientId) return p;
 
       if (kind === 'ecg') {
-        publishedLabel = '心電圖檢查';
-        return { ...p, ecgReports: (p.ecgReports || []).map(r => r.id === 'ecg-hr-1' ? { ...r, visible: true } : r) };
+        return {
+          ...p,
+          ecgReports: (p.ecgReports || []).map(r =>
+            r.id === 'ecg-hr-1' ? { ...r, visible: true } : r
+          )
+        };
       }
-      if (kind === 'cxr') {
-        publishedLabel = '影像檢查報告';
-        return { ...p, imagingStudies: (p.imagingStudies || []).map(r => r.id === 'img-hr-cxr-correct' ? { ...r, visible: true } : r) };
+
+      if (kind === 'cxr' && cxrTargetId) {
+        return {
+          ...p,
+          imagingStudies: (p.imagingStudies || []).map(r =>
+            r.id === cxrTargetId ? { ...r, visible: true } : r
+          )
+        };
       }
-      publishedLabel = '檢驗報告';
-      return { ...p, labReports: (p.labReports || []).map(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001', 'lab-hr-abg-1001'].includes(r.id) ? { ...r, visible: true } : r) };
+
+      const labIds = [
+        'lab-hr-cbc-1001',
+        'lab-hr-dc-1001',
+        'lab-hr-bio-1001',
+        'lab-hr-abg-1001'
+      ];
+      return {
+        ...p,
+        labReports: (p.labReports || []).map(r =>
+          labIds.includes(r.id) ? { ...r, visible: true } : r
+        )
+      };
     }));
 
     setToasts(prev => [...prev, {
-  id: `toast-manual-publish-${kind}-${Date.now()}`,
-  message: `🔔 有新的${publishedLabel || '檢查報告'}已發布。`,
-  type: 'success'
-}]);
+      id: `toast-manual-publish-${kind}-${Date.now()}`,
+      message: `🔔 有新的${publishedLabel}已發布。`,
+      type: 'success'
+    }]);
 
-addExamLogEntry(
-  `📢 教師手動發布：${publishedLabel || '指定報告'}。`,
-  publishedPatientName || '張清祥'
-);
+    addExamLogEntry(
+      `📢 教師手動發布：${publishedLabel}。`,
+      publishedPatientName
+    );
 
-triggerAudioNotify();
-};
+    triggerAudioNotify();
+  };
 
   // Helpers to select active patient object safely
   const activePatient = patients.find(p => p.id === activePatientId) || null;
