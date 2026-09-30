@@ -835,7 +835,7 @@ customLabSettings: {
     familySupport: '家屬固定探視，主要由養護機構照護人員協助日常生活照護',
     chiefComplaint: '意識變差、發燒、呼吸淺快及低血氧',
     presentIllness: '患者平時居住於養護機構，以鼻胃管灌食。昨日開始出現嗜睡，灌食後偶有嗆咳情形；今早發現意識變差、發燒、呼吸淺快，SpO₂ 85%，由養護機構送至本院急診，目前已追蹤胸部 X 光（CXR）。',
-    pastMedicalHistory: 'DM、HTN、CAD s/p stent、Old CVA、CKD stage III、COPD。Old CVA 後右側肢體無力。過敏史：無。',
+    pastMedicalHistory: 'DM、HTN、CAD s/p stent、Old CVA、CKD、COPD。Old CVA 後右側肢體無力。過敏史：無。',
     familyHistory: '父母已歿，無特殊家族遺傳疾病史',
     physicalStatus: '意識狀態較平時改變，呈嗜睡，發燒、呼吸淺快，SpO₂ 85%。Old CVA 後右側肢體無力，鼻胃管留置中（16 Fr）。'
   }
