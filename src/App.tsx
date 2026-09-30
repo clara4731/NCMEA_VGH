@@ -1426,117 +1426,42 @@ export default function App() {
     setToasts(prev => [...prev, { id: `toast-exam-reset-${Date.now()}`, message: '🔄 教師已重設倒數與情境，所有定時／手動報告已重新隱藏。', type: 'info' }]);
   };
 
- const handleManualPublish = (kind: 'ecg' | 'cxr' | 'lab') => {
-  let publishedPatientName = '';
-  let publishedLabel = '';
-  let didPublish = false;
+  const handleManualPublish = (kind: 'ecg' | 'cxr' | 'lab') => {
+    let publishedPatientName = '';
+    let publishedLabel = '';
 
-  setPatients(current => current.map(p => {
-    // ECG
-    if (kind === 'ecg') {
-      const hasTarget = (p.ecgReports || []).some(
-        r => r.id === 'ecg-hr-1' && !r.visible
-      );
-
+    setPatients(current => current.map(p => {
+      const hasTarget =
+        (kind === 'ecg' && (p.ecgReports || []).some(r => r.id === 'ecg-hr-1')) ||
+        (kind === 'cxr' && (p.imagingStudies || []).some(r => r.id === 'img-hr-cxr-correct')) ||
+        (kind === 'lab' && (p.labReports || []).some(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001', 'lab-hr-abg-1001'].includes(r.id)));
       if (!hasTarget) return p;
-
       publishedPatientName = p.name;
-      publishedLabel = '心電圖檢查';
-      didPublish = true;
 
-      return {
-        ...p,
-        ecgReports: (p.ecgReports || []).map(r =>
-          r.id === 'ecg-hr-1'
-            ? { ...r, visible: true }
-            : r
-        )
-      };
-    }
-
-    // CXR：同一顆按鈕依序發布兩張
-    if (kind === 'cxr') {
-      const manual1 = (p.imagingStudies || []).find(
-        r => r.id === 'img-hr-cxr-manual-1'
-      );
-
-      const manual2 = (p.imagingStudies || []).find(
-        r => r.id === 'img-hr-cxr-manual-2'
-      );
-
-      let targetId: string | null = null;
-
-      // 第一次按：發布 manual-1
-      if (manual1 && !manual1.visible) {
-        targetId = 'img-hr-cxr-manual-1';
+      if (kind === 'ecg') {
+        publishedLabel = '心電圖檢查';
+        return { ...p, ecgReports: (p.ecgReports || []).map(r => r.id === 'ecg-hr-1' ? { ...r, visible: true } : r) };
       }
-      // 第二次按：發布 manual-2
-      else if (manual2 && !manual2.visible) {
-        targetId = 'img-hr-cxr-manual-2';
+      if (kind === 'cxr') {
+        publishedLabel = '影像檢查報告';
+        return { ...p, imagingStudies: (p.imagingStudies || []).map(r => r.id === 'img-hr-cxr-correct' ? { ...r, visible: true } : r) };
       }
-
-      if (!targetId) return p;
-
-      publishedPatientName = p.name;
-      publishedLabel = '影像檢查報告';
-      didPublish = true;
-
-      return {
-        ...p,
-        imagingStudies: (p.imagingStudies || []).map(r =>
-          r.id === targetId
-            ? { ...r, visible: true }
-            : r
-        )
-      };
-    }
-
-    // Lab
-    if (kind === 'lab') {
-      const labIds = [
-        'lab-hr-cbc-1001',
-        'lab-hr-dc-1001',
-        'lab-hr-bio-1001',
-        'lab-hr-abg-1001'
-      ];
-
-      const hasTarget = (p.labReports || []).some(
-        r => labIds.includes(r.id) && !r.visible
-      );
-
-      if (!hasTarget) return p;
-
-      publishedPatientName = p.name;
       publishedLabel = '檢驗報告';
-      didPublish = true;
+      return { ...p, labReports: (p.labReports || []).map(r => ['lab-hr-cbc-1001', 'lab-hr-dc-1001', 'lab-hr-bio-1001', 'lab-hr-abg-1001'].includes(r.id) ? { ...r, visible: true } : r) };
+    }));
 
-      return {
-        ...p,
-        labReports: (p.labReports || []).map(r =>
-          labIds.includes(r.id)
-            ? { ...r, visible: true }
-            : r
-        )
-      };
-    }
+    setToasts(prev => [...prev, {
+  id: `toast-manual-publish-${kind}-${Date.now()}`,
+  message: `🔔 有新的${publishedLabel || '檢查報告'}已發布。`,
+  type: 'success'
+}]);
 
-    return p;
-  }));
+addExamLogEntry(
+  `📢 教師手動發布：${publishedLabel || '指定報告'}。`,
+  publishedPatientName || '張清祥'
+);
 
-  if (!didPublish) return;
-
-  setToasts(prev => [...prev, {
-    id: `toast-manual-publish-${kind}-${Date.now()}`,
-    message: `🔔 有新的${publishedLabel || '檢查報告'}已發布。`,
-    type: 'success'
-  }]);
-
-  addExamLogEntry(
-    `📢 教師手動發布：${publishedLabel || '指定報告'}。`,
-    publishedPatientName || '張清祥'
-  );
-
-  triggerAudioNotify();
+triggerAudioNotify();
 };
 
   // Helpers to select active patient object safely
