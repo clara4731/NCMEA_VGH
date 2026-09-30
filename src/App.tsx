@@ -1431,27 +1431,33 @@ export default function App() {
     let publishedPatientName = '';
     let publishedLabel = '';
 
-    // CXR uses one button for two sequential manual reports.
-    // 1st click -> manual-1, 2nd click -> manual-2, later clicks -> no action.
+      // CXR：同一顆按鈕依序發布兩張手動 CXR
     if (kind === 'cxr') {
       const targetPatient = patients.find(p =>
         (p.imagingStudies || []).some(r =>
-          r.id === 'img-hr-cxr-manual-1' || r.id === 'img-hr-cxr-manual-2'
+          r.id === 'img-hr-cxr-manual-1' ||
+          r.id === 'img-hr-cxr-manual-2'
         )
       );
+
       if (!targetPatient) return;
 
       const manual1 = (targetPatient.imagingStudies || []).find(
         r => r.id === 'img-hr-cxr-manual-1'
       );
+
       const manual2 = (targetPatient.imagingStudies || []).find(
         r => r.id === 'img-hr-cxr-manual-2'
       );
 
+      // 第一次按：發布 manual-1
+      // 第二次按：發布 manual-2
+      // 兩張都已發布：不做任何事
       let targetCxrId: string | null = null;
-      if (manual1 && !manual1.visible) {
+
+      if (manual1?.visible !== true) {
         targetCxrId = 'img-hr-cxr-manual-1';
-      } else if (manual2 && !manual2.visible) {
+      } else if (manual2?.visible !== true) {
         targetCxrId = 'img-hr-cxr-manual-2';
       } else {
         return;
@@ -1460,23 +1466,25 @@ export default function App() {
       const updatedPatient = {
         ...targetPatient,
         imagingStudies: (targetPatient.imagingStudies || []).map(r =>
-          r.id === targetCxrId ? { ...r, visible: true } : r
+          r.id === targetCxrId
+            ? { ...r, visible: true }
+            : r
         )
       };
 
-      // Update the local cache before writing so the Firestore listener will not
-      // immediately treat the same change as another local modification.
-      lastSyncedPatientsRef.current[targetPatient.id] = JSON.stringify(updatedPatient);
-      setPatients(current =>
-        current.map(p => p.id === targetPatient.id ? updatedPatient : p)
-      );
+      // 只寫入 Firebase
+      // 畫面交給原本的 Firebase listener 更新
       savePatientToFirestore(updatedPatient);
 
-      setToasts(prev => [...prev, {
-        id: `toast-manual-publish-cxr-${Date.now()}`,
-        message: '🔔 有新的影像檢查報告已發布。',
-        type: 'success'
-      }]);
+      // 只有真的發布一張新 CXR 才提示
+      setToasts(prev => [
+        ...prev,
+        {
+          id: `toast-manual-publish-cxr-${Date.now()}`,
+          message: '🔔 有新的影像檢查報告已發布。',
+          type: 'success'
+        }
+      ]);
 
       addExamLogEntry(
         '📢 教師手動發布：影像檢查報告。',
