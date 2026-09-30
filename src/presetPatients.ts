@@ -677,7 +677,6 @@ imagingStudies: [
     publishMode: 'manual'
   }
 ],
-],
 ecgReports: [
   {
     id: 'ecg-hr-1',
