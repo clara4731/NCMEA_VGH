@@ -645,27 +645,38 @@ export const PRESET_PATIENTS: Patient[] = [
       }
     ],
 imagingStudies: [
-{
-  id: 'img-hr-cxr-wrong',
-  title: '胸部 X 光檢查 (Chest X-Ray)',
-  studyType: 'XRAY',
-  imageUrl: '/cxr/cxr2_wrong.jpg',
-  description: 'Portable chest radiograph.',
-  dateTime: '2026-10-01T10:30:15',
-  visible: false,
-  publishMode: 'timer',
-  publishMinutesRemaining: 11
-},
-{
-  id: 'img-hr-cxr-correct',
-  title: '胸部 X 光檢查 (Chest X-Ray)',
-  studyType: 'XRAY',
-  imageUrl: '/cxr/cxr2_correct.jpg',
-  description: 'Portable chest radiograph.',
-  dateTime: '2026-10-01T10:35:15',
-  visible: false,
-  publishMode: 'manual'
-},
+  {
+    id: 'img-hr-cxr-wrong',
+    title: '胸部 X 光檢查 (Chest X-Ray)',
+    studyType: 'XRAY',
+    imageUrl: '/cxr/cxr2_wrong.jpg',
+    description: 'Portable chest radiograph.',
+    dateTime: '2026-10-01T10:30:15',
+    visible: false,
+    publishMode: 'timer',
+    publishMinutesRemaining: 11
+  },
+  {
+    id: 'img-hr-cxr-manual-1',
+    title: '胸部 X 光檢查 (Chest X-Ray)',
+    studyType: 'XRAY',
+    imageUrl: '/cxr/CXR2-error.jpg',
+    description: 'Portable chest radiograph.',
+    dateTime: '2026-10-01T10:35:15',
+    visible: false,
+    publishMode: 'manual'
+  },
+  {
+    id: 'img-hr-cxr-manual-2',
+    title: '胸部 X 光檢查 (Chest X-Ray)',
+    studyType: 'XRAY',
+    imageUrl: '/cxr/cxr2_correct.jpg',
+    description: 'Portable chest radiograph.',
+    dateTime: '2026-10-01T10:40:15',
+    visible: false,
+    publishMode: 'manual'
+  }
+],
 ],
 ecgReports: [
   {
