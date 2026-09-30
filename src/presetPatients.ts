@@ -509,7 +509,7 @@ export const PRESET_PATIENTS: Patient[] = [
     name: '張清祥',
     gender: 'M',
     age: 72,
-    bedNumber: '急診區 E-03',
+    bedNumber: '急診區 E-3',
     birthDate: '1954-12-21',
     admissionDiag: '肺炎 (Pneumonia)',
     summary: '72歲男性張清祥，因中風長期臥床、右側偏癱，居住於養護機構，平時意識清楚，以鼻胃管灌食。昨日開始出現嗜睡，灌食後偶有嗆咳情形，今早發現意識變差、發燒、呼吸淺快，SpO₂ 85%，由養護機構送入急診，目前已追蹤 CXR。',
